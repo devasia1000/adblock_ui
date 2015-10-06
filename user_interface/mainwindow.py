@@ -98,7 +98,19 @@ class Ui_MainWindow(QMainWindow):
         self.label.setText(QtGui.QApplication.translate("MainWindow", "Disabled", None, QtGui.QApplication.UnicodeUTF8))
         self.menuRouter_Interface.setTitle(QtGui.QApplication.translate("MainWindow", "Router Interface", None, QtGui.QApplication.UnicodeUTF8))
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
+        
+        self.dial.sliderMoved.connect(self.movedAdblockDial)
+        self.dial_2.sliderMoved.connect(self.movedPageCachingDial)
+        self.dial_3.sliderMoved.connect(self.movedZigbeeDial)
+    
+    def movedAdblockDial(self):
+        print 'Adblock slider has been moved'
 
+    def movedPageCachingDial(self):
+        print 'Page caching dial has been moved'
+
+    def movedZigbeeDial(self):
+        print 'Zigbee dial has been moved'
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
