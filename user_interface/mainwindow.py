@@ -103,14 +103,29 @@ class Ui_MainWindow(QMainWindow):
         self.dial_2.sliderMoved.connect(self.movedPageCachingDial)
         self.dial_3.sliderMoved.connect(self.movedZigbeeDial)
     
-    def movedAdblockDial(self):
-        print 'Adblock slider has been moved'
+    def movedAdblockDial(self, pos):
+        #print 'Adblock slider has been moved to ', pos
+        if pos >= 50:
+            label_str = 'Enabled'
+        else:
+            label_str = 'Disabled'
+        self.label_3.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
 
-    def movedPageCachingDial(self):
-        print 'Page caching dial has been moved'
+    def movedPageCachingDial(self, pos):
+        #print 'Page caching dial has been moved to ', pos
+        if pos >= 50:
+            label_str = 'Enabled'
+        else:
+            label_str = 'Disabled'
+        self.label_2.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
 
-    def movedZigbeeDial(self):
-        print 'Zigbee dial has been moved'
+    def movedZigbeeDial(self, pos):
+        #print 'Zigbee dial has been moved to ', pos
+        if pos >= 50:
+            label_str = 'Enabled'
+        else:
+            label_str = 'Disabled'
+        self.label.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
