@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
@@ -12,6 +13,9 @@ from PyQt4.QtCore import Qt, SIGNAL
 from PyQt4.QtGui import *
 
 import sys
+
+import os
+os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -33,12 +37,15 @@ class Ui_MainWindow(QMainWindow):
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
         self.label_6 = QtGui.QLabel(self.centralWidget)
+        self.label_6.setAlignment(QtCore.Qt.AlignCenter)
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.horizontalLayout_3.addWidget(self.label_6)
         self.label_5 = QtGui.QLabel(self.centralWidget)
+        self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.horizontalLayout_3.addWidget(self.label_5)
         self.label_4 = QtGui.QLabel(self.centralWidget)
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.horizontalLayout_3.addWidget(self.label_4)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
@@ -57,13 +64,16 @@ class Ui_MainWindow(QMainWindow):
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.label_3 = QtGui.QLabel(self.centralWidget)
+        self.label_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.horizontalLayout_2.addWidget(self.label_3)
         self.label_2 = QtGui.QLabel(self.centralWidget)
         self.label_2.setMinimumSize(QtCore.QSize(0, 52))
+        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.horizontalLayout_2.addWidget(self.label_2)
         self.label = QtGui.QLabel(self.centralWidget)
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName(_fromUtf8("label"))
         self.horizontalLayout_2.addWidget(self.label)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -99,9 +109,10 @@ class Ui_MainWindow(QMainWindow):
         self.menuRouter_Interface.setTitle(QtGui.QApplication.translate("MainWindow", "Router Interface", None, QtGui.QApplication.UnicodeUTF8))
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         
-        self.dial.sliderMoved.connect(self.movedAdblockDial)
-        self.dial_2.sliderMoved.connect(self.movedPageCachingDial)
-        self.dial_3.sliderMoved.connect(self.movedZigbeeDial)
+        self.dial.valueChanged.connect(self.movedAdblockDial)
+        self.dial_2.valueChanged.connect(self.movedPageCachingDial)
+        self.dial_3.valueChanged.connect(self.movedZigbeeDial)
+        
     
     def movedAdblockDial(self, pos):
         #print 'Adblock slider has been moved to ', pos
