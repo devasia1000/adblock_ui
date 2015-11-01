@@ -113,30 +113,52 @@ class Ui_MainWindow(QMainWindow):
         self.dial_2.valueChanged.connect(self.movedPageCachingDial)
         self.dial_3.valueChanged.connect(self.movedZigbeeDial)
         
-    
+    def sendDataToProxy(self, message):
+         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+         s.connect(('localhost', 9000))
+         s.send(message)
+         s.close()
+
     def movedAdblockDial(self, pos):
+        global adblockStatus
+        label_str = ""
         #print 'Adblock slider has been moved to ', pos
+        if pos >= 50 and adblockStatus is False:
+            adblockStatus = True
+            self.sendDataToProxy('enableAdblock')
+        elif pos < 50 and adblockStatus is True:
+            adblockStatus = False
+            self.sendDataToProxy('disableAdblock')
         if pos >= 50:
             label_str = 'Enabled'
-        else:
+        elif pos < 50:
             label_str = 'Disabled'
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
 
     def movedPageCachingDial(self, pos):
-        #print 'Page caching dial has been moved to ', pos
+        global cachingStatus
+        label_str = ""
+        #print 'Page caching slider has been moved to ', pos
+        if pos >= 50 and cachingStatus is False:
+            cachingStatus = True
+            self.sendDataToProxy('enableCaching')
+        elif pos < 50 and cachingStatus is True:
+            cachingStatus = False
+            self.sendDataToProxy('disableCaching')
         if pos >= 50:
             label_str = 'Enabled'
-        else:
+        elif pos < 50:
             label_str = 'Disabled'
         self.label_2.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
 
     def movedZigbeeDial(self, pos):
         #print 'Zigbee dial has been moved to ', pos
+        label_str = ""
         if pos >= 50:
             label_str = 'Enabled'
         else:
             label_str = 'Disabled'
-        self.label.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))    
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
