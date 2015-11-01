@@ -12,10 +12,16 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import Qt, SIGNAL
 from PyQt4.QtGui import *
 
-import sys
 
 import os
 os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
+
+import sys
+import socket
+
+adblockStatus = False
+cachingStatus = False
+zigbeeStatus = False
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
