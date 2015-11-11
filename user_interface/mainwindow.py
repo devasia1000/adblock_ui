@@ -22,6 +22,10 @@ import socket
 adblockStatus = False
 cachingStatus = False
 zigbeeStatus = False
+    
+adblockEnabledFile = '/etc/dnsmasq.d/dnsmasq.adlist.conf'
+adblockDisabledFile = '/home/pi/dnsmasq.adlist.conf'
+
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -118,6 +122,22 @@ class Ui_MainWindow(QMainWindow):
         self.dial.valueChanged.connect(self.movedAdblockDial)
         self.dial_2.valueChanged.connect(self.movedPageCachingDial)
         self.dial_3.valueChanged.connect(self.movedZigbeeDial)
+
+    def disableDnsAdblock(self):
+        global adblockEnabledFile
+        global adblockDisabledFile
+        if os.path.isfile(adblockEnabledFile):
+            print str('sudo mv ' + adblockEnabledFile + ' ' + adblockDisabledFile)
+            os.system('sudo mv ' + adblockEnabledFile + ' ' + adblockDisabledFile)
+            os.system('sudo service dnsmasq restart')
+
+    def enableDnsAdblock(self):
+        global adblockEnabledFile
+        global adblockDisabledFile
+        if os.path.isfile(adblockDisabledFile):
+            print str('sudo mv ' + adblockDisabledFile + ' ' + adblockEnabledFile)
+            os.system('sudo mv ' + adblockDisabledFile + ' ' + adblockEnabledFile)
+            os.system('sudo service dnsmasq restart')
         
     def sendDataToProxy(self, message):
          s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -128,34 +148,40 @@ class Ui_MainWindow(QMainWindow):
     def movedAdblockDial(self, pos):
         global adblockStatus
         label_str = ""
+
         #print 'Adblock slider has been moved to ', pos
-        if pos >= 50 and adblockStatus is False:
-            adblockStatus = True
-            self.sendDataToProxy('enableAdblock')
-        elif pos < 50 and adblockStatus is True:
-            adblockStatus = False
-            self.sendDataToProxy('disableAdblock')
         if pos >= 50:
             label_str = 'Enabled'
         elif pos < 50:
             label_str = 'Disabled'
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
+        
+        if pos >= 50 and adblockStatus is False:
+            adblockStatus = True
+            self.enableDnsAdblock()
+            self.sendDataToProxy('enableAdblock')
+        elif pos < 50 and adblockStatus is True:
+            adblockStatus = False
+            self.disableDnsAdblock()
+            self.sendDataToProxy('disableAdblock')
 
     def movedPageCachingDial(self, pos):
         global cachingStatus
         label_str = ""
+        
         #print 'Page caching slider has been moved to ', pos
+        if pos >= 50:
+            label_str = 'Enabled'
+        elif pos < 50:
+            label_str = 'Disabled'
+        self.label_2.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
+        
         if pos >= 50 and cachingStatus is False:
             cachingStatus = True
             self.sendDataToProxy('enableCaching')
         elif pos < 50 and cachingStatus is True:
             cachingStatus = False
             self.sendDataToProxy('disableCaching')
-        if pos >= 50:
-            label_str = 'Enabled'
-        elif pos < 50:
-            label_str = 'Disabled'
-        self.label_2.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))
 
     def movedZigbeeDial(self, pos):
         #print 'Zigbee dial has been moved to ', pos
@@ -170,4 +196,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     ex = Ui_MainWindow()
     ex.showMaximized()
+
+    os.system('java -cp /home/pi/java_http_proxy/out/production/java_http_proxy/ Main /home/pi/java_http_proxy/blocklist.txt 2>&1 | tee /home/pi/proxy_log.txt &')
+
     sys.exit(app.exec_())
