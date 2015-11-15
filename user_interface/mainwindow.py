@@ -113,31 +113,28 @@ class Ui_MainWindow(QMainWindow):
         self.label_6.setText(QtGui.QApplication.translate("MainWindow", "Adblock", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("MainWindow", "Page-caching", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("MainWindow", "Zigbee", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Disabled", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Adblock is ALWAYS enabled.\nThis dial has no effect", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Disabled", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("MainWindow", "Disabled", None, QtGui.QApplication.UnicodeUTF8))
         self.menuRouter_Interface.setTitle(QtGui.QApplication.translate("MainWindow", "Router Interface", None, QtGui.QApplication.UnicodeUTF8))
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         
-        self.dial.valueChanged.connect(self.movedAdblockDial)
+        # Ignore changes to adblock dial
+        # self.dial.valueChanged.connect(self.movedAdblockDial)
         self.dial_2.valueChanged.connect(self.movedPageCachingDial)
         self.dial_3.valueChanged.connect(self.movedZigbeeDial)
 
     def disableDnsAdblock(self):
         global adblockEnabledFile
         global adblockDisabledFile
-        if os.path.isfile(adblockEnabledFile):
-            print str('sudo mv ' + adblockEnabledFile + ' ' + adblockDisabledFile)
-            os.system('sudo mv ' + adblockEnabledFile + ' ' + adblockDisabledFile)
-            os.system('sudo service dnsmasq restart')
+        os.system('sudo rm /etc/dnsmasq.d/dnsmasq.adlist.conf')
+        os.system('sudo service dnsmasq restart &')
 
     def enableDnsAdblock(self):
         global adblockEnabledFile
         global adblockDisabledFile
-        if os.path.isfile(adblockDisabledFile):
-            print str('sudo mv ' + adblockDisabledFile + ' ' + adblockEnabledFile)
-            os.system('sudo mv ' + adblockDisabledFile + ' ' + adblockEnabledFile)
-            os.system('sudo service dnsmasq restart')
+        os.system('sudo ln -s /etc/dnsmasq.adlist.conf /etc/dnsmasq.d/dnsmasq.adlist.conf')
+        os.system('sudo service dnsmasq restart &')
         
     def sendDataToProxy(self, message):
          s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -197,6 +194,6 @@ if __name__ == '__main__':
     ex = Ui_MainWindow()
     ex.showMaximized()
 
-    os.system('java -cp /home/pi/java_http_proxy/out/production/java_http_proxy/ Main /home/pi/java_http_proxy/blocklist.txt 2>&1 | tee /home/pi/proxy_log.txt &')
+    os.system('java -cp /home/pi/java_http_proxy/out/production/java_http_proxy/:/home/pi/java_http_proxy/out/production/java_http_proxy/* Main /home/pi/java_http_proxy/blocklist.txt 2>&1 | tee /home/pi/proxy_log.txt &')
 
     sys.exit(app.exec_())
