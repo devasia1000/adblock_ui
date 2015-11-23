@@ -1,23 +1,15 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'mainwindow.ui'
-#
-# Created: Sun Oct  4 12:51:15 2015
-#      by: PyQt4 UI code generator 4.9.1
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import Qt, SIGNAL
 from PyQt4.QtGui import *
-
-
-import os
-os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
-
 import sys
 import socket
+import os
+import json
+
+sys.path.insert(0, '/home/pi/zigbee_spi/')
+from writer import init, set_led_on, set_led_off
+os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
 
 adblockStatus = False
 cachingStatus = False
@@ -189,11 +181,34 @@ class Ui_MainWindow(QMainWindow):
             label_str = 'Disabled'
         self.label.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))    
 
+def start_zigbee():
+    spi = init()
+  
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('52.25.165.62', 80))
+    print 'Connected to SmartThings endpoint'    
+
+    while True:
+        message = client_socket.recv(4096)
+        data = json.loads(message)
+
+        led = data['display_name']
+        value = data['value']
+
+        print led, 'is', value
+        if led == 'LED #1':
+            if value == 'on':
+                set_led_on(spi)
+            if value == 'off':
+                set_led_off(spi)
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     ex = Ui_MainWindow()
     ex.showMaximized()
 
     os.system('java -cp /home/pi/java_http_proxy/out/production/java_http_proxy/:/home/pi/java_http_proxy/out/production/java_http_proxy/* Main /home/pi/java_http_proxy/blocklist.txt 2>&1 | tee /home/pi/proxy_log.txt &')
+
+    start_zigbee()
 
     sys.exit(app.exec_())
