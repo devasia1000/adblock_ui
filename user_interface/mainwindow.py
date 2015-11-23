@@ -6,10 +6,11 @@ import sys
 import socket
 import os
 import json
+import thread
 
+os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
 sys.path.insert(0, '/home/pi/zigbee_spi/')
 from writer import init, set_led_on, set_led_off
-os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
 
 adblockStatus = False
 cachingStatus = False
@@ -17,7 +18,6 @@ zigbeeStatus = False
     
 adblockEnabledFile = '/etc/dnsmasq.d/dnsmasq.adlist.conf'
 adblockDisabledFile = '/home/pi/dnsmasq.adlist.conf'
-
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -173,13 +173,20 @@ class Ui_MainWindow(QMainWindow):
             self.sendDataToProxy('disableCaching')
 
     def movedZigbeeDial(self, pos):
-        #print 'Zigbee dial has been moved to ', pos
+        global zigbeeStatus
         label_str = ""
+        
+        #print 'Zigbee dial has been moved to ', pos
         if pos >= 50:
             label_str = 'Enabled'
         else:
             label_str = 'Disabled'
         self.label.setText(QtGui.QApplication.translate("MainWindow", label_str, None, QtGui.QApplication.UnicodeUTF8))    
+
+        if pos >= 50 and zigbeeStatus is False:
+            zigbeeStatus = True
+        elif pos < 50 and zigbeeStatus is True:
+            zigbeeStatus = False
 
 def start_zigbee():
     spi = init()
@@ -187,10 +194,15 @@ def start_zigbee():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('52.25.165.62', 80))
     print 'Connected to SmartThings endpoint'    
-
+    
+    global zigbeeStatus
     while True:
         message = client_socket.recv(4096)
         data = json.loads(message)
+        
+        if zigbeeStatus == False:
+            print 'Ignoring Zigbee message since zigbee_status is', zigbeeStatus
+            continue
 
         led = data['display_name']
         value = data['value']
@@ -206,9 +218,8 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     ex = Ui_MainWindow()
     ex.showMaximized()
-
+    
     os.system('java -cp /home/pi/java_http_proxy/out/production/java_http_proxy/:/home/pi/java_http_proxy/out/production/java_http_proxy/* Main /home/pi/java_http_proxy/blocklist.txt 2>&1 | tee /home/pi/proxy_log.txt &')
 
-    start_zigbee()
-
+    thread.start_new_thread(start_zigbee, ())
     sys.exit(app.exec_())
