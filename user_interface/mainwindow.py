@@ -113,7 +113,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         
         # Disable Adblock dial
-        self.dial.value = 100
+        self.dial.setSliderPosition(100)
         self.dial.setEnabled(False)
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", 'Enabled', None, QtGui.QApplication.UnicodeUTF8))
 
