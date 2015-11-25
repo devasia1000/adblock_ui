@@ -216,10 +216,10 @@ def start_zigbee():
         if led == 'LED #1':
             if value == 'on':
                 set_led_on(spi)
-                setWinkLightbulbState(False)
+                setWinkLightbulbState(True)
             if value == 'off':
                 set_led_off(spi)
-                setWinkLightbulbState(True)
+                setWinkLightbulbState(False)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
