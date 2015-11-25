@@ -112,8 +112,12 @@ class Ui_MainWindow(QMainWindow):
         self.menuRouter_Interface.setTitle(QtGui.QApplication.translate("MainWindow", "Router Interface", None, QtGui.QApplication.UnicodeUTF8))
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         
-        # Ignore changes to adblock dial
-        # self.dial.valueChanged.connect(self.movedAdblockDial)
+        # Disable Adblock dial
+        self.dial.value = 100
+        self.dial.setEnabled(False)
+        self.label_3.setText(QtGui.QApplication.translate("MainWindow", 'Enabled', None, QtGui.QApplication.UnicodeUTF8))
+
+        # Track changes to dials
         self.dial_2.valueChanged.connect(self.movedPageCachingDial)
         self.dial_3.valueChanged.connect(self.movedZigbeeDial)
 
