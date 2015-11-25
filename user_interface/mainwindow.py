@@ -11,6 +11,7 @@ import thread
 os.putenv('DISPLAY', ':0.0') # REQUIRED for startup on raspberry pi 
 sys.path.insert(0, '/home/pi/zigbee_spi/')
 from writer import init, set_led_on, set_led_off
+from wink import setWinkLightbulbState
 
 adblockStatus = False
 cachingStatus = False
@@ -211,8 +212,10 @@ def start_zigbee():
         if led == 'LED #1':
             if value == 'on':
                 set_led_on(spi)
+                setWinkLightbulbState(False)
             if value == 'off':
                 set_led_off(spi)
+                setWinkLightbulbState(True)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
